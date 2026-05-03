@@ -262,15 +262,15 @@ body {
 }
 .timeline-item:last-child::before { display: none; }
 .timeline-dot {
-    width: 36px; height: 36px; border-radius: 50%;
+    width: 36px; height: 36px; border-radius: 12px;
     display: grid; place-items: center; flex-shrink: 0;
-    font-size: 0.75rem; font-weight: 700; color: #fff;
+    font-size: 0.85rem; font-weight: 700; color: #fff;
     z-index: 1;
 }
-.timeline-dot.t1 { background: var(--accent); }
-.timeline-dot.t2 { background: var(--blue); }
-.timeline-dot.t3 { background: var(--green); }
-.timeline-dot.t4 { background: var(--orange); }
+.timeline-dot.t1 { background: rgba(124,108,255,0.15); color: var(--accent-light); border: 1px solid rgba(124,108,255,0.3); }
+.timeline-dot.t2 { background: rgba(59,130,246,0.15); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+.timeline-dot.t3 { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+.timeline-dot.t4 { background: rgba(251,191,36,0.15); color: var(--orange); border: 1px solid rgba(251,191,36,0.3); }
 .timeline-content h4 { font-size: 0.88rem; margin-bottom: 2px; }
 .timeline-content p { font-size: 0.8rem; color: var(--text-muted); }
 
@@ -284,10 +284,10 @@ body {
 }
 .step-item:hover { border-color: var(--accent); background: rgba(124,108,255,0.05); }
 .step-num {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), #6366f1);
+    width: 36px; height: 36px; border-radius: 12px;
+    background: rgba(124,108,255,0.15); border: 1px solid rgba(124,108,255,0.3);
     display: grid; place-items: center;
-    font-size: 0.75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    font-size: 0.85rem; font-weight: 700; color: var(--accent-light); flex-shrink: 0;
 }
 .step-text strong { display: block; font-size: 0.85rem; margin-bottom: 2px; }
 .step-text span { font-size: 0.78rem; color: var(--text-muted); }
@@ -585,26 +585,6 @@ body {
     color: var(--text-primary);
 }
 
-/* ===== Mini Chips (Recommendations) ===== */
-.mini-chip {
-    padding: 6px 12px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    color: var(--accent);
-    font-family: var(--font);
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: var(--transition);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.mini-chip:hover {
-    background: rgba(144, 202, 249, 0.1);
-    border-color: var(--accent);
-}
 
 /* ===== Responsive ===== */
 @media (max-width: 600px) {

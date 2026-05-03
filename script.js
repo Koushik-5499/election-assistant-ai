@@ -226,9 +226,6 @@
             messagesContainer.appendChild(msg);
             scrollToBottom();
             bindFAQToggles();
-            
-            // Generate contextual recommendations based on current step or last intent
-            appendRecommendations();
         }, baseDelay);
     }
 
@@ -293,48 +290,7 @@
 
     // ----- Response Modules -----
     
-    function appendRecommendations() {
-        // Remove old recs
-        const oldRecs = document.querySelectorAll('.inline-recs');
-        oldRecs.forEach(el => el.remove());
 
-        if (chatContext.step === 'age' || chatContext.step === 'firstTime' || chatContext.step === 'state') return; // Don't interrupt flow
-        if (messageCount < 2) return;
-
-        let recs = [];
-        if (chatContext.lastIntent === 'eligible' || chatContext.lastIntent === 'age') {
-            recs = [{lbl: t('chip_documents'), act: 'documents'}, {lbl: t('chip_steps'), act: 'steps'}];
-        } else if (chatContext.lastIntent === 'document') {
-            recs = [{lbl: t('chip_steps'), act: 'steps'}, {lbl: t('chip_location'), act: 'location'}];
-        } else if (chatContext.lastIntent === 'step') {
-            recs = [{lbl: t('chip_location'), act: 'location'}, {lbl: t('chip_timeline'), act: 'timeline'}];
-        } else {
-            recs = [{lbl: t('chip_faq'), act: 'faq'}, {lbl: t('chip_results'), act: 'results'}];
-        }
-
-        const recWrapper = document.createElement('div');
-        recWrapper.className = 'inline-recs';
-        recWrapper.style.display = 'flex';
-        recWrapper.style.gap = '8px';
-        recWrapper.style.marginTop = '10px';
-        recWrapper.style.flexWrap = 'wrap';
-
-        recs.forEach(r => {
-            const btn = document.createElement('button');
-            btn.className = 'mini-chip';
-            btn.style.fontSize = '0.75rem';
-            btn.textContent = r.lbl;
-            btn.addEventListener('click', () => handleAction(r.act));
-            recWrapper.appendChild(btn);
-        });
-
-        // Append to last bot bubble
-        const bubbles = messagesContainer.querySelectorAll('.message.bot .msg-bubble');
-        if (bubbles.length > 0) {
-            bubbles[bubbles.length - 1].appendChild(recWrapper);
-            scrollToBottom();
-        }
-    }
 
     // Eligibility
     function showEligibilityPrompt() {
@@ -716,37 +672,17 @@
 
     // Live Results
     function showLiveResults() {
-        const constituencies = [
-            { name: "Varanasi", leading: "NDA", trailing: "I.N.D.I.A", margin: "1,20,432" },
-            { name: "Wayanad", leading: "I.N.D.I.A", trailing: "NDA", margin: "89,540" },
-            { name: "Gandhinagar", leading: "NDA", trailing: "I.N.D.I.A", margin: "2,10,000" }
-        ];
-        
         let html = `
-            <h3><span class="material-icons-round">poll</span> Simulated Live Election Results</h3>
-            <p>Here are some simulated real-time updates from key constituencies:</p>
-            <div style="margin: 12px 0; display: flex; flex-direction: column; gap: 8px;">`;
+            <h3><span class="material-icons-round">poll</span> Live Election Results</h3>
+            <p>For the official, real-time election results, vote counting status, and winners, please visit the Election Commission of India (ECI) portal.</p>
             
-        constituencies.forEach(c => {
-            html += `
-                <div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px;">
-                    <strong>📍 ${c.name}</strong><br>
-                    <span style="color: var(--green); font-size: 0.85rem;">Leading: ${c.leading}</span> | 
-                    <span style="color: var(--red); font-size: 0.85rem;">Trailing: ${c.trailing}</span><br>
-                    <span style="font-size: 0.8rem; color: var(--text-muted);">Margin: ${c.margin} votes</span>
-                </div>
-            `;
-        });
-        
-        html += `</div>
-            <p style="margin-top:10px;">For the official, real-time election results, vote counting status, and winners, please visit the Election Commission of India (ECI).</p>
             <div style="margin: 16px 0; text-align: center;">
                 <a href="https://results.eci.gov.in/" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: linear-gradient(135deg, var(--accent), #6366f1); color: #fff; text-decoration: none; border-radius: 24px; font-weight: 600; font-size: 0.9rem; transition: transform 0.2s; box-shadow: 0 4px 12px var(--accent-glow);">
                     <span class="material-icons-round">open_in_new</span>
-                    View Live Election Results
+                    Open ECI Results Portal
                 </a>
             </div>
-            <p style="margin-top:10px;"><span class="info-tag"><span class="material-icons-round" style="font-size:14px">info</span> Links to the official ECI portal</span></p>
+            <p style="margin-top:10px;"><span class="info-tag"><span class="material-icons-round" style="font-size:14px">info</span> Opens securely in a new tab</span></p>
         `;
         addBotMessage(html);
     }
