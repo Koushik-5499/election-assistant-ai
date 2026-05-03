@@ -47,13 +47,13 @@ It acts like a virtual guide where users can ask questions and get clear answers
 
 ## 🌐 Live Demo
 
-[Add your deployed link here]
+[https://election-assistant-ai.vercel.app/]
 
 ---
 
 ## 📂 GitHub Repository
 
-[Add your repository link here]
+[https://github.com/Koushik-5499/election-assistant-ai.git]
 
 ---
 
