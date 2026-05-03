@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Skip to Content (Accessibility) -->
+    <a href="#user-input" class="skip-link">Skip to chat input</a>
+
     <!-- Ambient Background -->
     <div class="ambient-bg">
         <div class="ambient-orb orb-1"></div>
@@ -55,7 +58,7 @@
         </header>
 
         <!-- Chat Area -->
-        <main id="chat-area" class="chat-area">
+        <main id="chat-area" class="chat-area" role="main" aria-label="Chat conversation">
             <!-- Welcome Card -->
             <div id="welcome-card" class="welcome-card fade-in">
                 <div class="welcome-icon-wrapper">
@@ -98,7 +101,7 @@
             </div>
 
             <!-- Messages Container -->
-            <div id="messages-container" class="messages-container"></div>
+            <div id="messages-container" class="messages-container" aria-live="polite" aria-relevant="additions"></div>
 
             <!-- Typing Indicator -->
             <div id="typing-indicator" class="typing-indicator hidden">

@@ -1,39 +1,60 @@
-// ===== Election Process Assistant — Main Logic =====
+/**
+ * Election Process Assistant — Main Application Logic
+ * Modular, production-grade chatbot with fuzzy NLP,
+ * conversation memory, Firebase analytics, and accessibility.
+ */
 
 (function () {
     'use strict';
 
-    // ----- DOM References -----
-    const chatArea = document.getElementById('chat-area');
-    const messagesContainer = document.getElementById('messages-container');
-    const typingIndicator = document.getElementById('typing-indicator');
-    const welcomeCard = document.getElementById('welcome-card');
-    const userInput = document.getElementById('user-input');
-    const btnSend = document.getElementById('btn-send');
-    const btnVoice = document.getElementById('btn-voice');
-    const btnLocation = document.getElementById('btn-location');
-    const btnTheme = document.getElementById('btn-theme');
-    const floatingChips = document.getElementById('floating-chips');
-    const voiceModal = document.getElementById('voice-modal');
-    const voiceStop = document.getElementById('voice-stop');
-    const btnClear = document.getElementById('btn-clear');
-    const langSelector = document.getElementById('lang-selector');
+    // ═══════════════════════════════════════════
+    //  DOM Cache (queried once for performance)
+    // ═══════════════════════════════════════════
+    const DOM = {
+        chatArea:       document.getElementById('chat-area'),
+        messages:       document.getElementById('messages-container'),
+        typing:         document.getElementById('typing-indicator'),
+        welcome:        document.getElementById('welcome-card'),
+        input:          document.getElementById('user-input'),
+        btnSend:        document.getElementById('btn-send'),
+        btnVoice:       document.getElementById('btn-voice'),
+        btnLocation:    document.getElementById('btn-location'),
+        btnTheme:       document.getElementById('btn-theme'),
+        btnClear:       document.getElementById('btn-clear'),
+        floatingChips:  document.getElementById('floating-chips'),
+        voiceModal:     document.getElementById('voice-modal'),
+        voiceStop:      document.getElementById('voice-stop'),
+        langSelector:   document.getElementById('lang-selector'),
+        toastContainer: document.getElementById('toast-container')
+    };
 
-    // ----- State -----
-    let chatContext = { step: null, age: null, state: null, isFirstTime: null };
+    // ═══════════════════════════════════════════
+    //  Application State & Conversation Memory
+    // ═══════════════════════════════════════════
+    const FUZZY_THRESHOLD = 2; // max Levenshtein distance for typo tolerance
+
+    let chatContext = {
+        step: null,
+        age: null,
+        state: null,
+        isFirstTime: null,
+        lastIntent: null,
+        lastAnswer: null,
+        history: []        // stores {role, text, timestamp} for memory
+    };
     let messageCount = 0;
 
     // ----- Init -----
     function init() {
         bindEvents();
         initLang();
-        userInput.focus();
+        DOM.input.focus();
     }
 
     // ----- Event Bindings -----
     function bindEvents() {
-        btnSend.addEventListener('click', handleSend);
-        userInput.addEventListener('keydown', (e) => {
+        DOM.btnSend.addEventListener('click', handleSend);
+        DOM.input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') handleSend();
         });
 
@@ -43,20 +64,20 @@
         });
 
         // Header buttons
-        btnLocation.addEventListener('click', () => handleAction('location'));
-        btnTheme.addEventListener('click', toggleTheme);
-        btnVoice.addEventListener('click', startVoice);
-        if (btnClear) btnClear.addEventListener('click', clearChat);
+        DOM.btnLocation.addEventListener('click', () => handleAction('location'));
+        DOM.btnTheme.addEventListener('click', toggleTheme);
+        DOM.btnVoice.addEventListener('click', startVoice);
+        if (DOM.btnClear) DOM.btnClear.addEventListener('click', clearChat);
 
         // Modals
-        voiceStop.addEventListener('click', stopVoice);
-        voiceModal.addEventListener('click', (e) => {
-            if (e.target === voiceModal) stopVoice();
+        DOM.voiceStop.addEventListener('click', stopVoice);
+        DOM.voiceModal.addEventListener('click', (e) => {
+            if (e.target === DOM.voiceModal) stopVoice();
         });
 
         // Language
-        if (langSelector) {
-            langSelector.addEventListener('change', (e) => {
+        if (DOM.langSelector) {
+            DOM.langSelector.addEventListener('change', (e) => {
                 localStorage.setItem('appLang', e.target.value);
                 updateUILanguage();
             });
@@ -65,24 +86,24 @@
 
 
         // Show floating chips after scroll
-        chatArea.addEventListener('scroll', () => {
-            if (chatArea.scrollTop > 200 && messageCount > 0) {
-                floatingChips.classList.remove('hidden');
+        DOM.chatArea.addEventListener('scroll', () => {
+            if (DOM.chatArea.scrollTop > 200 && messageCount > 0) {
+                DOM.floatingChips.classList.remove('hidden');
             } else {
-                floatingChips.classList.add('hidden');
+                DOM.floatingChips.classList.add('hidden');
             }
         });
     }
 
     // ----- Handle Send -----
     function handleSend() {
-        const text = userInput.value.trim();
+        const text = DOM.input.value.trim();
         if (!text) return;
-        userInput.value = '';
+        DOM.input.value = '';
         addUserMessage(text);
 
-        if (window.MockFirebase) {
-            MockFirebase.logQuery(text, 'User Input', chatContext);
+        if (window.ElectionFirebase) {
+            ElectionFirebase.logQuery(text, 'User Input', 1, chatContext);
         }
 
         if (chatContext.step === 'age') {
@@ -169,7 +190,7 @@
         for (const p of patterns) {
             // Exact match
             if (p.keys.some((k) => lower.includes(k))) {
-                if (window.MockFirebase) MockFirebase.logQuery(text, 'Matched: ' + p.id, chatContext);
+                if (window.ElectionFirebase) ElectionFirebase.logQuery(text, 'Matched: ' + p.id, 1, chatContext);
                 chatContext.lastIntent = p.id;
                 p.action();
                 return;
@@ -190,17 +211,17 @@
         }
 
         if (bestMatch) {
-            if (window.MockFirebase) MockFirebase.logQuery(text, 'Fuzzy Matched: ' + bestMatch.id, chatContext);
+            if (window.ElectionFirebase) ElectionFirebase.logQuery(text, 'Fuzzy: ' + bestMatch.id, (1 - lowestDist / 5).toFixed(2), chatContext);
             chatContext.lastIntent = bestMatch.id;
             
             // Add a small "Did you mean?" transition
-            addBotMessage(`<p style="font-size:0.85rem; color:var(--text-muted);"><em>I think you're asking about <strong>${bestMatch.id}</strong>. Here you go:</em></p>`, 400);
+            addBotMessage(`<p style="font-size:0.85rem; color:var(--text-muted);"><em>${t('fuzzy_prefix')} <strong>${bestMatch.id}</strong>:</em></p>`, 400);
             setTimeout(() => bestMatch.action(), 600);
             return;
         }
 
 
-        if (window.MockFirebase) MockFirebase.logQuery(text, 'Unmatched / Fallback', chatContext);
+        if (window.ElectionFirebase) ElectionFirebase.logQuery(text, 'fallback', 0, chatContext);
         showFallback(text);
     }
 
@@ -208,22 +229,24 @@
     function addUserMessage(text) {
         hideWelcome();
         messageCount++;
+        chatContext.history.push({ role: 'user', text, ts: Date.now() });
         const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         const msg = createMessageEl('user', `<p>${escapeHtml(text)}</p>`, time);
-        messagesContainer.appendChild(msg);
+        DOM.messages.appendChild(msg);
         scrollToBottom();
     }
 
     function addBotMessage(html, customDelay = 0) {
         showTyping();
-        // Dynamic delay based on text length (simulating typing speed), clamped between 600ms and 2000ms
-        const baseDelay = customDelay || Math.min(Math.max(html.length * 10, 600), 2000);
-        
+        const baseDelay = customDelay || Math.min(Math.max(html.length * 8, 500), 1800);
+
         setTimeout(() => {
             hideTyping();
+            chatContext.lastAnswer = html;
+            chatContext.history.push({ role: 'bot', text: html.replace(/<[^>]*>/g, '').slice(0, 200), ts: Date.now() });
             const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             const msg = createMessageEl('bot', html, time);
-            messagesContainer.appendChild(msg);
+            DOM.messages.appendChild(msg);
             scrollToBottom();
             bindFAQToggles();
         }, baseDelay);
@@ -232,53 +255,90 @@
     function createMessageEl(type, html, time) {
         const wrapper = document.createElement('div');
         wrapper.className = `message ${type}`;
+        wrapper.setAttribute('role', 'log');
+        wrapper.setAttribute('aria-label', type === 'bot' ? 'Assistant response' : 'Your message');
         const icon = type === 'bot' ? 'smart_toy' : 'person';
+
+        // Bot messages get copy & speak accessibility buttons
+        const a11yActions = type === 'bot' ? `
+            <div class="msg-actions" style="display:flex; gap:4px; margin-top:6px; justify-content:flex-end;">
+                <button class="msg-action-btn" data-copy aria-label="Copy response" title="Copy">
+                    <span class="material-icons-round" style="font-size:15px;">content_copy</span>
+                </button>
+                <button class="msg-action-btn" data-speak aria-label="Read aloud" title="Read aloud">
+                    <span class="material-icons-round" style="font-size:15px;">volume_up</span>
+                </button>
+            </div>` : '';
+
         wrapper.innerHTML = `
             <div class="msg-avatar"><span class="material-icons-round">${icon}</span></div>
             <div class="msg-bubble">
                 ${html}
+                ${a11yActions}
                 <div class="msg-time" style="font-size: 0.65rem; opacity: 0.6; text-align: right; margin-top: 4px;">${time}</div>
             </div>
         `;
+
+        // Bind copy button
+        const copyBtn = wrapper.querySelector('[data-copy]');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const text = wrapper.querySelector('.msg-bubble').innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(t('a11y_copy_success'), 'success');
+                }).catch(() => {});
+            });
+        }
+
+        // Bind speak button (text-to-speech)
+        const speakBtn = wrapper.querySelector('[data-speak]');
+        if (speakBtn) {
+            speakBtn.addEventListener('click', () => {
+                try {
+                    const text = wrapper.querySelector('.msg-bubble').innerText;
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = localStorage.getItem('appLang') === 'hi' ? 'hi-IN'
+                                   : localStorage.getItem('appLang') === 'ta' ? 'ta-IN'
+                                   : 'en-IN';
+                    speechSynthesis.cancel();
+                    speechSynthesis.speak(utterance);
+                    showToast(t('a11y_speak_start'), 'info');
+                } catch (_) {}
+            });
+        }
+
         return wrapper;
     }
 
     function hideWelcome() {
-        if (welcomeCard) welcomeCard.style.display = 'none';
+        if (DOM.welcome) DOM.welcome.style.display = 'none';
     }
 
-    function showTyping() { 
-        typingIndicator.classList.remove('hidden'); 
-        messagesContainer.appendChild(typingIndicator); // move to bottom
-        scrollToBottom(); 
+    function showTyping() {
+        DOM.typing.classList.remove('hidden');
+        DOM.messages.appendChild(DOM.typing);
+        scrollToBottom();
     }
-    function hideTyping() { typingIndicator.classList.add('hidden'); }
+    function hideTyping() { DOM.typing.classList.add('hidden'); }
 
     function clearChat() {
-        // Remove all messages
-        messagesContainer.innerHTML = '';
+        DOM.messages.innerHTML = '';
         messageCount = 0;
-        chatContext = { step: null, age: null, state: null, isFirstTime: null };
+        chatContext = { step: null, age: null, state: null, isFirstTime: null, lastIntent: null, lastAnswer: null, history: [] };
+        DOM.floatingChips.classList.add('hidden');
 
-        // Hide floating chips
-        floatingChips.classList.add('hidden');
-
-        // Show welcome card
-        if (welcomeCard) {
-            welcomeCard.style.display = 'block';
-            welcomeCard.classList.remove('fade-in');
-            // Trigger reflow to restart animation
-            void welcomeCard.offsetWidth;
-            welcomeCard.classList.add('fade-in');
+        if (DOM.welcome) {
+            DOM.welcome.style.display = 'block';
+            DOM.welcome.classList.remove('fade-in');
+            void DOM.welcome.offsetWidth;
+            DOM.welcome.classList.add('fade-in');
         }
-
-        // Add default bot message
         addBotMessage(t('bot_hello'));
     }
 
     function scrollToBottom() {
         requestAnimationFrame(() => {
-            chatArea.scrollTop = chatArea.scrollHeight;
+            DOM.chatArea.scrollTop = DOM.chatArea.scrollHeight;
         });
     }
 
@@ -700,60 +760,68 @@
         `);
     }
 
-    // ----- Voice Input -----
+    // ═══════════════════════════════════════════
+    //  Voice Input (Web Speech API)
+    // ═══════════════════════════════════════════
     function startVoice() {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-IN';
-            recognition.interimResults = false;
+        try {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-IN';
+                recognition.interimResults = false;
 
-            voiceModal.classList.remove('hidden');
-            btnVoice.classList.add('listening');
+                DOM.voiceModal.classList.remove('hidden');
+                DOM.btnVoice.classList.add('listening');
 
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                userInput.value = transcript;
-                stopVoice();
-                setTimeout(() => handleSend(), 300);
-            };
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    DOM.input.value = transcript;
+                    stopVoice();
+                    setTimeout(() => handleSend(), 300);
+                };
 
-            recognition.onerror = () => {
-                stopVoice();
-                addBotMessage(`<p>Sorry, I couldn't hear you clearly. Please try again or type your question instead. 🎤</p>`);
-            };
+                recognition.onerror = () => {
+                    stopVoice();
+                    addBotMessage(`<p>${t('error_voice')}</p>`);
+                };
 
-            recognition.onend = () => stopVoice();
-            recognition.start();
-            window._recognition = recognition;
-        } else {
-            // Fallback simulation
-            voiceModal.classList.remove('hidden');
-            btnVoice.classList.add('listening');
-            setTimeout(() => {
-                const simQueries = ['How to vote', 'Am I eligible', 'What documents needed', 'Election timeline'];
-                const q = simQueries[Math.floor(Math.random() * simQueries.length)];
-                userInput.value = q;
-                stopVoice();
-                setTimeout(() => handleSend(), 300);
-            }, 2500);
+                recognition.onend = () => stopVoice();
+                recognition.start();
+                window._recognition = recognition;
+            } else {
+                // Fallback simulation for unsupported browsers
+                DOM.voiceModal.classList.remove('hidden');
+                DOM.btnVoice.classList.add('listening');
+                setTimeout(() => {
+                    const simQueries = ['How to vote', 'Am I eligible', 'What documents needed', 'Election timeline'];
+                    DOM.input.value = simQueries[Math.floor(Math.random() * simQueries.length)];
+                    stopVoice();
+                    setTimeout(() => handleSend(), 300);
+                }, 2500);
+            }
+        } catch (err) {
+            stopVoice();
+            showToast(t('error_general'), 'error');
         }
     }
 
     function stopVoice() {
-        voiceModal.classList.add('hidden');
-        btnVoice.classList.remove('listening');
+        DOM.voiceModal.classList.add('hidden');
+        DOM.btnVoice.classList.remove('listening');
         if (window._recognition) {
             try { window._recognition.abort(); } catch (_) {}
             window._recognition = null;
         }
     }
 
-    // ----- UI & Translation Helpers -----
+    // ═══════════════════════════════════════════
+    //  Language & UI Translation
+    // ═══════════════════════════════════════════
     function initLang() {
-        if (langSelector) {
+        if (DOM.langSelector) {
             const savedLang = localStorage.getItem('appLang') || 'en';
-            langSelector.value = savedLang;
+            DOM.langSelector.value = savedLang;
             updateUILanguage();
         }
     }
@@ -765,7 +833,7 @@
         const welcomeDesc = document.querySelector('#welcome-card p');
         if (welcomeDesc) welcomeDesc.textContent = t('welcome_desc');
 
-        if (userInput) userInput.placeholder = t('placeholder');
+        if (DOM.input) DOM.input.placeholder = t('placeholder');
         
         const inputHint = document.querySelector('.input-hint');
         if (inputHint) inputHint.textContent = t('hint');
@@ -796,30 +864,33 @@
         if (voiceText) voiceText.textContent = t('voice_listening');
     }
 
+    // ═══════════════════════════════════════════
+    //  Toast Notifications
+    // ═══════════════════════════════════════════
     function showToast(msg, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-        
+        if (!DOM.toastContainer) return;
+
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        
-        let icon = 'info';
-        if (type === 'success') icon = 'check_circle';
-        else if (type === 'error') icon = 'error';
-        
-        toast.innerHTML = `<span class="material-icons-round">${icon}</span> <span>${msg}</span>`;
-        container.appendChild(toast);
-        
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'polite');
+
+        const icons = { success: 'check_circle', error: 'error', info: 'info' };
+        toast.innerHTML = `<span class="material-icons-round">${icons[type] || 'info'}</span> <span>${escapeHtml(msg)}</span>`;
+        DOM.toastContainer.appendChild(toast);
+
         setTimeout(() => {
             toast.style.animation = 'toastSlide 0.3s ease-in reverse forwards';
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
 
-    // ----- Theme Toggle -----
+    // ═══════════════════════════════════════════
+    //  Theme Toggle (Dark / Light)
+    // ═══════════════════════════════════════════
     function toggleTheme() {
         const root = document.documentElement;
-        const icon = btnTheme.querySelector('.material-icons-round');
+        const icon = DOM.btnTheme.querySelector('.material-icons-round');
         const isLight = document.body.classList.toggle('light-theme');
 
         if (isLight) {

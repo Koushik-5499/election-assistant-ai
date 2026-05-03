@@ -585,14 +585,54 @@ body {
     color: var(--text-primary);
 }
 
+/* ===== Message Action Buttons (Copy / Speak) ===== */
+.msg-action-btn {
+    width: 28px; height: 28px; border: none;
+    background: rgba(255,255,255,0.06); border-radius: 8px;
+    color: var(--text-muted); cursor: pointer;
+    display: grid; place-items: center;
+    transition: var(--transition);
+    opacity: 0;
+}
+.msg-bubble:hover .msg-action-btn,
+.msg-action-btn:focus { opacity: 1; }
+.msg-action-btn:hover { background: rgba(124,108,255,0.15); color: var(--accent-light); }
+
+/* ===== Keyboard Focus Styles (Accessibility) ===== */
+:focus-visible {
+    outline: 2px solid var(--accent-light);
+    outline-offset: 2px;
+}
+.chip:focus-visible, .mini-chip:focus-visible, .header-btn:focus-visible,
+.input-btn:focus-visible, .msg-action-btn:focus-visible {
+    outline: 2px solid var(--accent-light);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+/* ===== Skip Link (Accessibility) ===== */
+.skip-link {
+    position: absolute; top: -40px; left: 0;
+    background: var(--accent); color: #fff;
+    padding: 8px 16px; z-index: 200;
+    font-size: 0.85rem; text-decoration: none;
+    border-radius: 0 0 8px 0;
+    transition: top 0.3s;
+}
+.skip-link:focus { top: 0; }
 
 /* ===== Responsive ===== */
 @media (max-width: 600px) {
     .app-header { padding: 12px 14px; }
     .header-text h1 { font-size: 1rem; }
+    .header-right { gap: 4px; }
+    .header-btn { width: 36px; height: 36px; }
+    .lang-selector { padding: 6px 8px; font-size: 0.8rem; }
     .welcome-card { padding: 28px 16px 24px; }
     .welcome-card h2 { font-size: 1.25rem; }
     .chip { padding: 8px 14px; font-size: 0.78rem; }
     .msg-bubble { padding: 12px 14px; font-size: 0.84rem; }
+    .msg-action-btn { opacity: 1; } /* Always visible on mobile (no hover) */
     .input-area { padding: 10px 12px 14px; }
+    .floating-chips { bottom: 80px; }
 }
