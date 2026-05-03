@@ -1,84 +1,33 @@
-# 🗳️ Election Process Assistant
+# Election Process Assistant
 
-## 📌 Problem
-Many people are unaware of how the election process works. They often get confused about voting steps, required documents, eligibility, and important timelines. This lack of awareness can reduce participation and create hesitation among first-time voters.
+A smart, dynamic, and production-level AI-powered web application to guide users through the election process, check eligibility, locate polling booths, and view live election results.
 
----
+## Features
+- **Context-Aware Chatbot:** Asks for user details (age, state, first-time voter status) and gives personalized guidance.
+- **Live Election Results:** Simulates dynamic constituency-level live result fetching.
+- **Google Services Integration:** Includes a Google Maps embed for polling booths and a Google Translate widget for multi-language support.
+- **Voice Interaction:** Web Speech API for voice queries.
+- **Responsive & Accessible UI:** Modern glassmorphism design with accessibility features (ARIA labels, keyboard navigation).
+- **Clear Chat:** Instant reset of the conversation state.
 
-## 💡 Solution
-The **Election Process Assistant** is an AI-powered web application that helps users understand the election process in a simple, interactive, and user-friendly way.  
+## Testing the Application
 
-It acts like a virtual guide where users can ask questions and get clear answers about voting procedures, documents, and timelines.
+### Sample Inputs and Expected Outputs
 
----
+| User Input | Expected Bot Output |
+| :--- | :--- |
+| **"Am I eligible to vote?"** | Bot asks for age. If age >= 18, it asks if the user is a first-time voter and provides personalized registration links. If < 18, it calculates years left until eligibility. |
+| **"Where is my polling booth?"** | Opens the location modal which simulates geolocation and displays a Google Map of the nearest polling station. |
+| **"Show me live results"** | Bot initiates a simulated fetch of real-time constituency results, displaying a styled data card with leading candidates, and a link to the official ECI portal. |
+| **"What documents do I need?"** | Provides a structured list of required (Voter ID, Aadhaar) and optional (Passport, Driving License) documents. |
+| **"xyz123"** (Unknown query) | Bot triggers the "Did you mean?" fallback, suggesting closely related topics like "Check eligibility" or "Voting steps". |
+| **[Clicking Clear Chat icon]** | Instantly wipes the conversation history, resets context, and shows the initial greeting. |
 
-## 🚀 Features
+## Structure
+- `index.html` - Semantic structure, modals, Google Translate element, and Map iframe.
+- `style.css` - CSS variables, responsive design, dark/light theme toggling, animations.
+- `script.js` - Context-aware NLP logic, UI interactions, and simulated API fetchers.
+- `firebase-config.js` - Mock configuration for storing query logs.
 
-- 💬 Chat-based assistant for user interaction  
-- 🗳️ Step-by-step voting process explanation  
-- 📄 Required documents for voting  
-- 📅 Election timeline overview  
-- ✅ Eligibility checker (based on age)  
-- ⚡ Quick action buttons for faster access  
-- 🔗 Direct link to official live election results  
-- 🧹 Clear chat functionality  
-- 📱 Responsive and clean UI  
-
----
-
-## 🧠 How It Works
-
-- User enters a query in the chat interface  
-- The system detects keywords (like "steps", "documents", "eligibility")  
-- Based on input, it provides structured responses  
-- If the query is unknown, it gives a helpful fallback response  
-- Users can also use quick buttons for instant answers  
-
----
-
-## 🛠️ Tech Stack
-
-- HTML  
-- CSS  
-- JavaScript  
-- Google Antigravity (for AI-assisted development)
-
----
-
-## 🌐 Live Demo
-
-[https://election-assistant-ai.vercel.app/]
-
----
-
-## 📂 GitHub Repository
-
-[https://github.com/Koushik-5499/election-assistant-ai.git]
-
----
-
-## 📊 Use Case
-
-This project is useful for:
-- First-time voters  
-- Students learning about elections  
-- General public awareness  
-
----
-
-## ⚠️ Note
-
-This project is built for educational and demonstration purposes.  
-Users are guided to official Election Commission websites for real-time data and verification.
-
----
-
-## 🙌 Acknowledgement
-
-Developed as part of **PromptWars Challenge** using Google Antigravity.
-
----
-
-## 📬 Contact
-
-Feel free to connect or give feedback!
+## Setup
+Simply serve the directory using a local web server (e.g., `npx http-server`) and open `index.html`.

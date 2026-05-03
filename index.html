@@ -37,6 +37,11 @@
                 </div>
             </div>
             <div class="header-right">
+                <select id="lang-selector" class="lang-selector" aria-label="Select Language">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="ta">தமிழ்</option>
+                </select>
                 <button id="btn-clear" class="header-btn" title="Clear Chat" aria-label="Clear Chat">
                     <span class="material-icons-round">delete_sweep</span>
                 </button>
@@ -147,49 +152,6 @@
         </footer>
     </div>
 
-    <!-- Location Modal -->
-    <div id="location-modal" class="modal-overlay hidden">
-        <div class="modal-card">
-            <div class="modal-header">
-                <span class="material-icons-round modal-icon">location_on</span>
-                <h3>Nearest Polling Booth</h3>
-                <button id="modal-close" class="modal-close" aria-label="Close modal">
-                    <span class="material-icons-round">close</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="location-detecting" id="location-detecting">
-                    <div class="location-pulse"></div>
-                    <p>Detecting your location...</p>
-                </div>
-                <div class="location-result hidden" id="location-result">
-                    <div class="booth-card">
-                        <div class="booth-icon">
-                            <span class="material-icons-round">account_balance</span>
-                        </div>
-                        <div class="booth-info">
-                            <h4 id="booth-name">Government Higher Secondary School</h4>
-                            <p id="booth-address">Ward 12, Municipal Office Road</p>
-                            <div class="booth-meta">
-                                <span class="booth-tag"><span class="material-icons-round">directions_walk</span> <span id="booth-distance">1.2 km</span></span>
-                                <span class="booth-tag"><span class="material-icons-round">access_time</span> 7 AM - 6 PM</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="map-placeholder" id="map-placeholder">
-                        <span class="material-icons-round">map</span>
-                        <p>Polling Booth Location</p>
-                        <small>Interactive map view</small>
-                    </div>
-                    <button class="btn-directions" id="btn-directions">
-                        <span class="material-icons-round">directions</span>
-                        Get Directions
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Voice Modal -->
     <div id="voice-modal" class="modal-overlay hidden">
         <div class="voice-card">
@@ -241,6 +203,11 @@
         </div>
     </section>
 
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="firebase-config.js"></script>
+    <script src="translations.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
