@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Election Process Assistant - Your smart AI guide to understanding elections, voting eligibility, required documents, and the complete voting process.">
+    <meta name="keywords" content="election, voting, eligibility, voter ID, polling booth, election timeline, voting guide">
+    <title>Election Process Assistant — Your Smart Voting Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Ambient Background -->
+    <div class="ambient-bg">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+    </div>
+
+    <!-- App Container -->
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header id="app-header" class="app-header">
+            <div class="header-left">
+                <div class="logo-icon">
+                    <span class="material-icons-round">how_to_vote</span>
+                </div>
+                <div class="header-text">
+                    <h1>Election Assistant</h1>
+                    <p class="header-subtitle">
+                        <span class="status-dot"></span>
+                        AI-Powered • Always Ready
+                    </p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="btn-clear" class="header-btn" title="Clear Chat" aria-label="Clear Chat">
+                    <span class="material-icons-round">delete_sweep</span>
+                </button>
+                <button id="btn-location" class="header-btn" title="Find Polling Booth" aria-label="Find nearest polling booth">
+                    <span class="material-icons-round">my_location</span>
+                </button>
+                <button id="btn-theme" class="header-btn" title="Toggle Theme" aria-label="Toggle dark/light theme">
+                    <span class="material-icons-round">dark_mode</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Chat Area -->
+        <main id="chat-area" class="chat-area">
+            <!-- Welcome Card -->
+            <div id="welcome-card" class="welcome-card fade-in">
+                <div class="welcome-icon-wrapper">
+                    <span class="material-icons-round welcome-icon">ballot</span>
+                </div>
+                <h2>Welcome to Election Assistant</h2>
+                <p>I'm your smart guide to understanding elections. Ask me anything about voting eligibility, required documents, voting steps, or election timelines!</p>
+                
+                <!-- Quick Action Chips -->
+                <div class="quick-actions" id="welcome-chips">
+                    <button class="chip" data-action="eligibility" id="chip-eligibility">
+                        <span class="material-icons-round">verified_user</span>
+                        Check Eligibility
+                    </button>
+                    <button class="chip" data-action="steps" id="chip-steps">
+                        <span class="material-icons-round">format_list_numbered</span>
+                        Voting Steps
+                    </button>
+                    <button class="chip" data-action="documents" id="chip-documents">
+                        <span class="material-icons-round">description</span>
+                        Required Documents
+                    </button>
+                    <button class="chip" data-action="timeline" id="chip-timeline">
+                        <span class="material-icons-round">timeline</span>
+                        Election Timeline
+                    </button>
+                    <button class="chip" data-action="results" id="chip-results">
+                        <span class="material-icons-round">poll</span>
+                        Live Results
+                    </button>
+                    <button class="chip" data-action="faq" id="chip-faq">
+                        <span class="material-icons-round">quiz</span>
+                        FAQs
+                    </button>
+                    <button class="chip" data-action="location" id="chip-location">
+                        <span class="material-icons-round">location_on</span>
+                        Nearest Booth
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="messages-container" class="messages-container"></div>
+
+            <!-- Typing Indicator -->
+            <div id="typing-indicator" class="typing-indicator hidden">
+                <div class="typing-avatar">
+                    <span class="material-icons-round">smart_toy</span>
+                </div>
+                <div class="typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Quick Actions (visible after scroll) -->
+        <div id="floating-chips" class="floating-chips hidden">
+            <button class="mini-chip" data-action="eligibility" title="Eligibility">
+                <span class="material-icons-round">verified_user</span>
+            </button>
+            <button class="mini-chip" data-action="steps" title="Voting Steps">
+                <span class="material-icons-round">format_list_numbered</span>
+            </button>
+            <button class="mini-chip" data-action="documents" title="Documents">
+                <span class="material-icons-round">description</span>
+            </button>
+            <button class="mini-chip" data-action="timeline" title="Timeline">
+                <span class="material-icons-round">timeline</span>
+            </button>
+            <button class="mini-chip" data-action="results" title="Live Results">
+                <span class="material-icons-round">poll</span>
+            </button>
+        </div>
+
+        <!-- Input Area -->
+        <footer id="input-area" class="input-area">
+            <div class="input-wrapper">
+                <button id="btn-voice" class="input-btn voice-btn" title="Voice Input" aria-label="Voice input">
+                    <span class="material-icons-round">mic</span>
+                </button>
+                <input 
+                    type="text" 
+                    id="user-input" 
+                    class="chat-input" 
+                    placeholder="Ask about elections, voting, eligibility..." 
+                    autocomplete="off"
+                    aria-label="Type your question"
+                >
+                <button id="btn-send" class="input-btn send-btn" title="Send Message" aria-label="Send message">
+                    <span class="material-icons-round">send</span>
+                </button>
+            </div>
+            <p class="input-hint">Try: "Am I eligible to vote?" or "What documents do I need?"</p>
+        </footer>
+    </div>
+
+    <!-- Location Modal -->
+    <div id="location-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span class="material-icons-round modal-icon">location_on</span>
+                <h3>Nearest Polling Booth</h3>
+                <button id="modal-close" class="modal-close" aria-label="Close modal">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="location-detecting" id="location-detecting">
+                    <div class="location-pulse"></div>
+                    <p>Detecting your location...</p>
+                </div>
+                <div class="location-result hidden" id="location-result">
+                    <div class="booth-card">
+                        <div class="booth-icon">
+                            <span class="material-icons-round">account_balance</span>
+                        </div>
+                        <div class="booth-info">
+                            <h4 id="booth-name">Government Higher Secondary School</h4>
+                            <p id="booth-address">Ward 12, Municipal Office Road</p>
+                            <div class="booth-meta">
+                                <span class="booth-tag"><span class="material-icons-round">directions_walk</span> <span id="booth-distance">1.2 km</span></span>
+                                <span class="booth-tag"><span class="material-icons-round">access_time</span> 7 AM - 6 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="map-placeholder" id="map-placeholder">
+                        <span class="material-icons-round">map</span>
+                        <p>Polling Booth Location</p>
+                        <small>Interactive map view</small>
+                    </div>
+                    <button class="btn-directions" id="btn-directions">
+                        <span class="material-icons-round">directions</span>
+                        Get Directions
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Modal -->
+    <div id="voice-modal" class="modal-overlay hidden">
+        <div class="voice-card">
+            <div class="voice-waves">
+                <div class="voice-wave"></div>
+                <div class="voice-wave"></div>
+                <div class="voice-wave"></div>
+            </div>
+            <p class="voice-text">Listening...</p>
+            <button id="voice-stop" class="voice-stop-btn" aria-label="Stop listening">
+                <span class="material-icons-round">mic_off</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Static FAQ Section Below Chat -->
+    <section class="static-faq-section" id="static-faq">
+        <div class="faq-container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <div class="faq-item" data-faq>
+                    <div class="faq-q">
+                        <span class="material-icons-round">expand_more</span>
+                        How do I register as a voter?
+                    </div>
+                    <div class="faq-a">
+                        You can register online at <strong>voters.eci.gov.in</strong> using Form 6, or visit your nearest Electoral Registration Office with your ID proof and address proof. You must be at least 18 years old on the qualifying date.
+                    </div>
+                </div>
+                <div class="faq-item" data-faq>
+                    <div class="faq-q">
+                        <span class="material-icons-round">expand_more</span>
+                        Can I vote without an Aadhaar Card?
+                    </div>
+                    <div class="faq-a">
+                        <strong>Yes!</strong> Aadhaar is not mandatory for voting. Your Voter ID (EPIC) is the primary document. If you don't have a Voter ID, you can use other approved photo IDs like a Passport or Driving License if your name is on the electoral roll.
+                    </div>
+                </div>
+                <div class="faq-item" data-faq>
+                    <div class="faq-q">
+                        <span class="material-icons-round">expand_more</span>
+                        What is NOTA?
+                    </div>
+                    <div class="faq-a">
+                        NOTA stands for <strong>"None Of The Above"</strong>. It allows voters to officially reject all candidates. It's the last option on the EVM and ensures your right to express dissent while maintaining voter secrecy.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
