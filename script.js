@@ -11,20 +11,20 @@
     //  DOM Cache (queried once for performance)
     // ═══════════════════════════════════════════
     const DOM = {
-        chatArea:       document.getElementById('chat-area'),
-        messages:       document.getElementById('messages-container'),
-        typing:         document.getElementById('typing-indicator'),
-        welcome:        document.getElementById('welcome-card'),
-        input:          document.getElementById('user-input'),
-        btnSend:        document.getElementById('btn-send'),
-        btnVoice:       document.getElementById('btn-voice'),
-        btnLocation:    document.getElementById('btn-location'),
-        btnTheme:       document.getElementById('btn-theme'),
-        btnClear:       document.getElementById('btn-clear'),
-        floatingChips:  document.getElementById('floating-chips'),
-        voiceModal:     document.getElementById('voice-modal'),
-        voiceStop:      document.getElementById('voice-stop'),
-        langSelector:   document.getElementById('lang-selector'),
+        chatArea: document.getElementById('chat-area'),
+        messages: document.getElementById('messages-container'),
+        typing: document.getElementById('typing-indicator'),
+        welcome: document.getElementById('welcome-card'),
+        input: document.getElementById('user-input'),
+        btnSend: document.getElementById('btn-send'),
+        btnVoice: document.getElementById('btn-voice'),
+        btnLocation: document.getElementById('btn-location'),
+        btnTheme: document.getElementById('btn-theme'),
+        btnClear: document.getElementById('btn-clear'),
+        floatingChips: document.getElementById('floating-chips'),
+        voiceModal: document.getElementById('voice-modal'),
+        voiceStop: document.getElementById('voice-stop'),
+        langSelector: document.getElementById('lang-selector'),
         toastContainer: document.getElementById('toast-container')
     };
 
@@ -147,19 +147,19 @@
     // ----- NLP-like Input Processing -----
     // Levenshtein distance for fuzzy matching
     function getEditDistance(a, b) {
-        if(a.length == 0) return b.length; 
-        if(b.length == 0) return a.length; 
+        if (a.length == 0) return b.length;
+        if (b.length == 0) return a.length;
 
         var matrix = [];
-        for(var i = 0; i <= b.length; i++) matrix[i] = [i];
-        for(var j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (var i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (var j = 0; j <= a.length; j++) matrix[0][j] = j;
 
-        for(var i = 1; i <= b.length; i++) {
-            for(var j = 1; j <= a.length; j++) {
-                if(b.charAt(i-1) == a.charAt(j-1)) {
-                    matrix[i][j] = matrix[i-1][j-1];
+        for (var i = 1; i <= b.length; i++) {
+            for (var j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) == a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
                 } else {
-                    matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1));
+                    matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
                 }
             }
         }
@@ -213,7 +213,7 @@
         if (bestMatch) {
             if (window.ElectionFirebase) ElectionFirebase.logQuery(text, 'Fuzzy: ' + bestMatch.id, (1 - lowestDist / 5).toFixed(2), chatContext);
             chatContext.lastIntent = bestMatch.id;
-            
+
             // Add a small "Did you mean?" transition
             addBotMessage(`<p style="font-size:0.85rem; color:var(--text-muted);"><em>${t('fuzzy_prefix')} <strong>${bestMatch.id}</strong>:</em></p>`, 400);
             setTimeout(() => bestMatch.action(), 600);
@@ -230,7 +230,7 @@
         hideWelcome();
         messageCount++;
         chatContext.history.push({ role: 'user', text, ts: Date.now() });
-        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const msg = createMessageEl('user', `<p>${escapeHtml(text)}</p>`, time);
         DOM.messages.appendChild(msg);
         scrollToBottom();
@@ -244,7 +244,7 @@
             hideTyping();
             chatContext.lastAnswer = html;
             chatContext.history.push({ role: 'bot', text: html.replace(/<[^>]*>/g, '').slice(0, 200), ts: Date.now() });
-            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const msg = createMessageEl('bot', html, time);
             DOM.messages.appendChild(msg);
             scrollToBottom();
@@ -286,7 +286,7 @@
                 const text = wrapper.querySelector('.msg-bubble').innerText;
                 navigator.clipboard.writeText(text).then(() => {
                     showToast(t('a11y_copy_success'), 'success');
-                }).catch(() => {});
+                }).catch(() => { });
             });
         }
 
@@ -298,12 +298,12 @@
                     const text = wrapper.querySelector('.msg-bubble').innerText;
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = localStorage.getItem('appLang') === 'hi' ? 'hi-IN'
-                                   : localStorage.getItem('appLang') === 'ta' ? 'ta-IN'
-                                   : 'en-IN';
+                        : localStorage.getItem('appLang') === 'ta' ? 'ta-IN'
+                            : 'en-IN';
                     speechSynthesis.cancel();
                     speechSynthesis.speak(utterance);
                     showToast(t('a11y_speak_start'), 'info');
-                } catch (_) {}
+                } catch (_) { }
             });
         }
 
@@ -349,7 +349,7 @@
     }
 
     // ----- Response Modules -----
-    
+
 
 
     // Eligibility
@@ -632,7 +632,7 @@
                     { name: 'Primary School, Block A', addr: 'Village Panchayat Office Lane', dist: '0.8 km' },
                 ];
                 const booth = booths[Math.floor(Math.random() * booths.length)];
-                
+
                 const mapIframe = `<iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d19919.440419619725!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sin!4v1777820732322!5m2!1sen!2sin" width="100%" height="200" style="border:0; border-radius:12px; margin-top:10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
 
                 addBotMessage(`
@@ -737,7 +737,7 @@
             <p>For the official, real-time election results, vote counting status, and winners, please visit the Election Commission of India (ECI) portal.</p>
             
             <div style="margin: 16px 0; text-align: center;">
-                <a href="https://results.eci.gov.in/" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: linear-gradient(135deg, var(--accent), #6366f1); color: #fff; text-decoration: none; border-radius: 24px; font-weight: 600; font-size: 0.9rem; transition: transform 0.2s; box-shadow: 0 4px 12px var(--accent-glow);">
+                <a href="https://results.eci.gov.in/ResultAcGenMay2026/index.htm" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: linear-gradient(135deg, var(--accent), #6366f1); color: #fff; text-decoration: none; border-radius: 24px; font-weight: 600; font-size: 0.9rem; transition: transform 0.2s; box-shadow: 0 4px 12px var(--accent-glow);">
                     <span class="material-icons-round">open_in_new</span>
                     Open ECI Results Portal
                 </a>
@@ -810,7 +810,7 @@
         DOM.voiceModal.classList.add('hidden');
         DOM.btnVoice.classList.remove('listening');
         if (window._recognition) {
-            try { window._recognition.abort(); } catch (_) {}
+            try { window._recognition.abort(); } catch (_) { }
             window._recognition = null;
         }
     }
@@ -834,7 +834,7 @@
         if (welcomeDesc) welcomeDesc.textContent = t('welcome_desc');
 
         if (DOM.input) DOM.input.placeholder = t('placeholder');
-        
+
         const inputHint = document.querySelector('.input-hint');
         if (inputHint) inputHint.textContent = t('hint');
 
@@ -848,7 +848,7 @@
             'chip-faq': 'chip_faq',
             'chip-location': 'chip_location'
         };
-        
+
         for (const [id, key] of Object.entries(chips)) {
             const chip = document.getElementById(id);
             if (chip) {
@@ -859,7 +859,7 @@
 
         const staticFaqTitle = document.querySelector('.static-faq-section h2');
         if (staticFaqTitle) staticFaqTitle.textContent = t('faq_title');
-        
+
         const voiceText = document.querySelector('.voice-text');
         if (voiceText) voiceText.textContent = t('voice_listening');
     }
